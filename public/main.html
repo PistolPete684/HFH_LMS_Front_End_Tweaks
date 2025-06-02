@@ -1,0 +1,98 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <title>Main</title>
+  <!-- Bootstrap CSS -->
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+  />
+  <style>
+    body {
+      background-color: #f8f9fa;
+    }
+    .card {
+      max-width: 400px;
+      margin: 2rem auto;
+    }
+  </style>
+</head>
+<body>
+  <div class="card shadow-sm" id="protected-card" style="display: none;">
+    <div class="card-body">
+      <!-- message container -->
+      <div id="message"></div>
+      <!-- protected content -->
+      <div id="content" style="display: none;">
+        <h1 class="card-title text-center mb-4">Welcome!</h1>
+        <p class="text-center">You’ve successfully logged in.</p>
+        <button id="logout" class="btn btn-primary w-100">Log Out</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } 
+      from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js';
+    import {
+      getAuth,
+      onAuthStateChanged,
+      signOut
+    } from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js';
+
+    // ─── Your Firebase config ───
+    const firebaseConfig = {
+      apiKey:            "AIzaSyBTVCtVoV_34fhS0ye_vpVDi-vw_zmfBvQ",
+      authDomain:        "habitatlms.firebaseapp.com",
+      projectId:         "habitatlms",
+      storageBucket:     "habitatlms.firebasestorage.app",
+      messagingSenderId: "737193756301",
+      appId:             "1:737193756301:web:dc889ded764abdf13a04c4",
+      measurementId:     "G-03X9VE3Q5B"
+    };
+
+    // Initialize Firebase & Auth
+    const app  = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    window.addEventListener('DOMContentLoaded', () => {
+      const card       = document.getElementById('protected-card');
+      const messageDiv = document.getElementById('message');
+      const contentDiv = document.getElementById('content');
+      const logoutBtn  = document.getElementById('logout');
+
+      // Watch auth state
+      onAuthStateChanged(auth, user => {
+        card.style.display = 'block';
+        if (user) {
+          // Signed in → show protected content
+          messageDiv.innerHTML = '';
+          contentDiv.style.display = 'block';
+        } else {
+          // Not signed in → hide content, show login prompt
+          contentDiv.style.display = 'none';
+          messageDiv.innerHTML = `
+            <div class="alert alert-danger text-center" role="alert">
+              You must be logged in to access this page.<br/>
+              <a href="index.html" class="alert-link">Go to Login</a>
+            </div>`;
+        }
+      });
+
+      // Log out handler: sign out then redirect immediately
+      logoutBtn.addEventListener('click', () => {
+        signOut(auth).catch(console.error);
+        location.replace('index.html');
+      });
+    });
+  </script>
+
+  <!-- Bootstrap JS (optional) -->
+  <script
+    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
+  ></script>
+</body>
+</html>
+
